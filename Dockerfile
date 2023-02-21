@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y openssl sqlite3
 FROM base as deps
 
 WORKDIR /myapp
+EXPOSE 80
+EXPOSE 443
+EXPOSE 8080
 
 ADD package.json package-lock.json .npmrc ./
 RUN npm install --production=false
