@@ -1,0 +1,15 @@
+Routes
+
+Language selection page: /language
+
+Homepage (all decks / all cards): /home (or /decks by default and /cards)
+
+Deck details: /decks/:deckId
+(Deck details edit: /decks/:deckId/edit)
+Decks create: /decks/new (modal)
+
+Card details: /cards/:cardId (modal)
+(Card details edit: /cards/:cardId/edit)
+Cards create: /cards/new (modal)
+
+Profile page: /profile
