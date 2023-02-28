@@ -1,6 +1,16 @@
 import { Link } from '@remix-run/react';
+import type { LoaderArgs } from '@remix-run/server-runtime';
+import { redirect } from '@remix-run/server-runtime';
+import { getUser } from '~/session.server';
 
 import { useOptionalUser } from '~/utils/utils';
+
+export async function loader({ request }: LoaderArgs) {
+  const user = await getUser(request);
+  // Redirect to language page if user has no languages
+  if (user && user.languages && user.languages.length === 0) return redirect('/language');
+  return null;
+}
 
 export default function Index() {
   const user = useOptionalUser();

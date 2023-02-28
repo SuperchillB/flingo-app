@@ -1,36 +1,55 @@
 import { Combobox } from '@headlessui/react';
-import { Form } from '@remix-run/react';
+import type { Language } from '@prisma/client';
+import { Form, useLoaderData } from '@remix-run/react';
 import type { ActionArgs } from '@remix-run/server-runtime';
 import { json, redirect } from '@remix-run/server-runtime';
 import { useState, useMemo } from 'react';
-import languages from '~/data/languages.json';
-import type { Language } from '~/_types/Languages';
+import { getAllLanguages } from '~/models/languages.server';
+import { updateUserLanguage } from '~/models/user.server';
+import { getUser, requireUserId } from '~/session.server';
+
+export async function loader({ request }: ActionArgs) {
+  const user = await getUser(request);
+  const languages = await getAllLanguages();
+  if (!languages || languages.length === 0) {
+    throw new Response('Languages not found', {
+      status: 404,
+    });
+  }
+  if (user && user.languages.length > 0) {
+    return redirect('/');
+  }
+  return json({ languages });
+}
 
 export async function action({ request }: ActionArgs) {
+  const userId = await requireUserId(request);
+
   const formData = await request.formData();
   const languageId = formData.get('language[id]');
+  const languageLangId = formData.get('language[langId]');
   const languageName = formData.get('language[name]');
   const languageNativeName = formData.get('language[nativeName]');
-  // const english = formData.get('english');
 
   const selectedLang = {
     id: languageId,
+    langId: languageLangId,
     name: languageName,
     nativeName: languageNativeName,
   } as Language;
-
-  console.log('selectedLang', selectedLang);
 
   if (typeof languageId !== 'string' || languageId.length === 0) {
     return json({ errors: { title: 'Target language is required', body: null } }, { status: 400 });
   }
 
-  // TODO: update user in DB (set selectedLanguage)
+  await updateUserLanguage(userId, selectedLang);
 
   return redirect('/decks');
 }
 
 export default function LanguagePage() {
+  const data = useLoaderData();
+  const languages = data.languages as Language[];
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const [query, setQuery] = useState('');
 
@@ -40,7 +59,7 @@ export default function LanguagePage() {
       : languages.filter((lang) => {
           return lang.name.toLowerCase().includes(query.toLowerCase());
         });
-  }, [query]);
+  }, [languages, query]);
 
   return (
     <div>
@@ -74,13 +93,18 @@ export default function LanguagePage() {
             onChange={setSelectedLanguage}
             value={selectedLanguage}
           >
-            <Combobox.Input
-              className="block w-full appearance-none rounded border border-gray-200 bg-gray-200 py-3 px-4 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
-              displayValue={(lang: Language) => (lang ? `${lang.name} | ${lang.nativeName}` : '')}
-              id="grid-last-name"
-              onChange={(event) => setQuery(event.target.value)}
-              required
-            />
+            <Combobox.Button
+              as="div"
+              className="block w-full appearance-none rounded border border-gray-200 bg-gray-200 py-3 px-4 leading-tight text-gray-700 focus:border-gray-500 focus:outline-none"
+            >
+              <Combobox.Input
+                className="block w-full appearance-none border-gray-200 bg-gray-200 leading-tight text-gray-700 focus:border-gray-500 focus:outline-none"
+                displayValue={(lang: Language) => (lang ? `${lang.name} | ${lang.nativeName}` : '')}
+                id="grid-last-name"
+                onChange={(event) => setQuery(event.target.value)}
+                required
+              />
+            </Combobox.Button>
             <Combobox.Options>
               {filteredLanguages.map((lang) => (
                 <Combobox.Option
