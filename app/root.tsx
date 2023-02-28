@@ -12,6 +12,8 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Flingo',
+  description:
+    'Keep all your learned vocab in one place and practice your language skills more efficiently',
   viewport: 'width=device-width,initial-scale=1',
 });
 
@@ -22,7 +24,7 @@ export async function loader({ request }: LoaderArgs) {
   });
 }
 
-export default function App() {
+function Document({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
@@ -33,11 +35,19 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <Outlet />
+        {children}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+export default function App() {
+  return (
+    <Document>
+      <Outlet />
+    </Document>
   );
 }
