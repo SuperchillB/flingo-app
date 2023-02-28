@@ -46,7 +46,9 @@ function isUser(user: any): user is User {
   return user && typeof user === 'object' && typeof user.email === 'string';
 }
 
+// ! Once our root loader is returning the user data, we can create a custom hook to use that data in any child route
 export function useOptionalUser(): User | undefined {
+  // ! useMatchesData("root") will return the loader data from the root route.
   const data = useMatchesData('root');
   if (!data || !isUser(data.user)) {
     return undefined;
