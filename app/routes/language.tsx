@@ -16,7 +16,7 @@ export async function loader({ request }: ActionArgs) {
       status: 404,
     });
   }
-  if (user && user.languages.length > 0) {
+  if (!user || (user && user.languages.length > 0)) {
     return redirect('/');
   }
   return json({ languages });

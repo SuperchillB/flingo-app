@@ -5,7 +5,7 @@ import allLanguages from '~/data/languages.json';
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = 'rachel@remix.run';
+  const email = 'bertie@email.com';
 
   // cleanup the existing database
   await prisma.user.delete({ where: { email } }).catch(() => {
@@ -19,7 +19,7 @@ async function seed() {
     }),
   );
 
-  const hashedPassword = await bcrypt.hash('racheliscool', 10);
+  const hashedPassword = await bcrypt.hash('flingotest', 10);
 
   const user = await prisma.user.create({
     data: {
