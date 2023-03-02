@@ -53,6 +53,22 @@ async function seed() {
     },
   });
 
+  await prisma.deck.create({
+    data: {
+      title: 'My first deck',
+      description: 'This is a description',
+      userId: user.id,
+    },
+  });
+
+  await prisma.deck.create({
+    data: {
+      title: 'My second deck',
+      description: 'This is a description',
+      userId: user.id,
+    },
+  });
+
   console.log(`Database has been seeded. 🌱`);
 }
 
