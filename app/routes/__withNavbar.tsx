@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client';
 import { Outlet, useRouteLoaderData } from '@remix-run/react';
-import Navbar from '~/components/_nav/Navbar.jsx';
+import Navbar from '~/components/_nav/Navbar';
 
 type LoaderData = {
   user: User;
